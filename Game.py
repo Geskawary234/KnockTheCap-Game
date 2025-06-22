@@ -1,7 +1,7 @@
 from Box2D.b2 import *
 import pyglet as pg
 from pyglet import math
-from Tools import LoadAsset
+from Tools import *
 from Objects import *
 from random import uniform,randint
 
@@ -19,7 +19,8 @@ world.contactListener = CapContactListener()
 batch = pg.graphics.Batch()
 
 
-
+bg = pg.sprite.Sprite(LoadAsset('assets/table.jpg'),x = 0, y = 0, batch = batch)
+bg.scale = 1.48
 
         
 #s1 = PhysCircle(PPM,world,0.5,0.5,1,color = (255,0,0,255),batch = batch)
