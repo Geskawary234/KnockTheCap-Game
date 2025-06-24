@@ -121,10 +121,16 @@ class Hand(pg.sprite.Sprite):
             position=(0,0),
             fixtures=fixture_def
         )
-        
 
-        
-        
+
+        hand_pos = (x / PPM, y / PPM)
+
+        # Create a rectangular collider for the hand
+        shape = b2.polygonShape()
+        shape.SetAsBox(0.75, 0.75, b2.vec2(0,0),0)  # 2x1 meter rectangle centered on the body
+
+        self.body = world.CreateKinematicBody(position=hand_pos)
+        self.body.CreateFixture(shape=shape, density=1.0)
 
     def set_frame(self, index):
         if 0 <= index < len(self.frames):
@@ -136,6 +142,8 @@ class Hand(pg.sprite.Sprite):
     def update(self,delta):
         self.sensor.position.x = self.x / self.PPM*2
         self.sensor.position.y = self.y / self.PPM*2
+
+        self.body.position = (self.x / self.PPM * 2, self.y / self.PPM*2 - 1.5)
         
         if self.HandFrameChangedTime > 0:
             self.HandFrameChangedTime -= delta

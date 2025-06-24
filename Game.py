@@ -18,12 +18,16 @@ world.contactListener = CapContactListener()
 
 batch = pg.graphics.Batch()
 
-
-bg = pg.sprite.Sprite(LoadAsset('assets/table.jpg'),x = 0, y = 0, batch = batch)
-bg.scale = 1.48
+#background
+bg_tex = LoadAsset('assets/table.png')
+bg_tex.anchor_x = bg_tex.width // 2
+bg_tex.anchor_y = bg_tex.height // 2
+bg = pg.sprite.Sprite(bg_tex,x = window.width/2, y = window.height/2, batch = batch)
+bg.scale = 0.7
+bg.rotation = 270
 
         
-#s1 = PhysCircle(PPM,world,0.5,0.5,1,color = (255,0,0,255),batch = batch)
+#walls
 wall1 = PhysRect(PPM,world,5,10,25,0.5,batch = batch)
 wall2 = PhysRect(PPM,world,5,-0.5,20,0.5,batch = batch)
 wall3 = PhysRect(PPM,world,-0.5,5,1,10,batch = batch)
@@ -31,7 +35,11 @@ wall4 = PhysRect(PPM,world,13.5,5,1,10,batch = batch)
 
 
 
+#cap & hand
 cap = Cap(PPM,world,0.5,x = (window.width//2)/PPM,y = (window.height//2)/PPM,batch = batch)
+
+hand = Hand(PPM=100, world=world, x=5, y=5, batch = batch)
+strength = 25
 
 def play_sfx(sfx,pitch = 1, volume = 1):
     if audio_player.playing:
@@ -50,15 +58,17 @@ def play_sliding_sfx(volume):
         
 
 
-hand = Hand(PPM=100, world=world, x=5, y=5, batch = batch)
 
-strength = 25
 
 @window.event
 def on_draw():
     window.clear()
-    #pg.shapes.Circle(hand.sensor.position.x * PPM,hand.sensor.position.y * PPM,radius = 1*PPM).draw()
     batch.draw()
+    #pg.shapes.Circle(hand.sensor.position.x * PPM,hand.sensor.position.y * PPM,radius = 1*PPM).draw()
+    
+    
+
+    #pg.shapes.Rectangle(hand.body.position.x * PPM,hand.body.position.y * PPM,PPM,PPM).draw()
 
     
 
@@ -67,20 +77,23 @@ def on_mouse_press(x, y, button, modifiers):
     if button == pg.window.mouse.LEFT and hand.HandFrameChangedTime<=0 :
         hand.set_frame(1)
         hand.HandFrameChangedTime = 0.25
-        
-        hand_fix = hand.sensor.fixtures[0]
-        cap_fix = cap.body.fixtures[0]
-        pos = (x/PPM,y/PPM)
-        
-        if are_fixtures_overlapping(hand_fix,cap_fix):
-            direction = cap.body.position - hand.sensor.position
-            direction.Normalize()
-            
-    
-            impulse = strength * direction
-            cap.body.ApplyLinearImpulse(impulse, pos, wake=True)
 
-            play_sfx(cap.hit_sfx, pitch = uniform(0.75,1.25))
+        #print(c)
+        hand_fix = hand.sensor.fixtures[0]
+        c = cap
+        cap_fix = c.body.fixtures[0]
+        pos = (x/PPM,y/PPM)
+            
+        if are_fixtures_overlapping(hand_fix,cap_fix):
+
+            direction = c.body.position - hand.sensor.position
+            direction.Normalize()
+                
+        
+            impulse = strength * direction
+            c.body.ApplyLinearImpulse(impulse, pos, wake=True)
+
+            play_sfx(c.hit_sfx, pitch = uniform(0.75,1.25))
             
 
 @window.event
@@ -108,6 +121,7 @@ def process(delta):
             volume = cap.get_velocity_len()/40
             play_sliding_sfx(volume)
             #play_sfx(,volume = volume)
+
 
         
 
